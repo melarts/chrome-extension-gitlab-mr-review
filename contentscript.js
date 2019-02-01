@@ -68,12 +68,19 @@ async function parseMrs(mrs) {
     const type = mrs[0].projectId ? 'projects' : 'groups';
     id = mrs[0].projectId || mrs[0].groupId;
     if (type === 'groups') {
+        let total = [];
+        let nbResult = 100;
+        let i = 1;
         // get the project id of each mr by getting the list of opened mrs in their group id
-        await getJson(`/api/v4/${type}/${id}/merge_requests?state=opened&view=simple&per_page=500`).then((res) => {
-            mrs = mrs.map(mr => {
-                const moreInfos = res.find(re => re.id === mr.id)
-                return { ...mr, projectId: moreInfos.project_id };
-            })
+        while(nbResult >= 100) {
+            const res = await getJson(`/api/v4/${type}/${id}/merge_requests?state=opened&view=simple&per_page=500&page=${i}`);
+            nbResult = res.length;
+            total = [...total, ...res];
+            i++;
+        }
+        mrs = mrs.map(mr => {
+            const moreInfos = total.find(re => re.id === mr.id)
+            return { ...mr, projectId: moreInfos.project_id };
         })
     }
 
@@ -93,16 +100,10 @@ async function parseMrs(mrs) {
         const baseProjectUrl = '/api/v4/projects/' + mr.projectId + '/merge_requests';
 
         chrome.storage.local.get([approvedCacheKey, commentedCacheKey], function (cachedValues) {
-            if (cachedValues[approvedCacheKey]) {
-                identifyMr(mrId, 'approved');
-            } else if (mr.isValidated) {
+            if (mr.isValidated) {
                 identifyMr(mrId, 'approved');
                 setLocalCacheValue(approvedCacheKey, true);
             }
-
-            if (cachedValues[commentedCacheKey]) {
-                identifyMr(mrId, 'commented');
-            } else {
                 getJson(baseProjectUrl + '/' + mrIid + '/notes').then(function (res) {
                     const userHasCommented = res.filter(function (comment) {
                         return comment.author.username === window.gon.current_username;
@@ -113,7 +114,7 @@ async function parseMrs(mrs) {
                         setLocalCacheValue(commentedCacheKey, true);
                     }
                 });
-            }
+        
         });
     })
 }
