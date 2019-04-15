@@ -53,6 +53,7 @@ function parseMrLists() {
                 iid: parseInt(lists[i].children[j].getElementsByClassName('issuable-reference')[0].innerText.split('!')[1]),
                 projectId: findProjectId(),
                 groupId: findGroupId(),
+                authorId: parseInt(lists[i].children[j].getElementsByClassName('issuable-authored')[0].getElementsByTagName('a')[0].getAttribute('data-user-id'))
             });
         }
     }
@@ -62,7 +63,7 @@ function parseMrLists() {
 
 async function parseMrs(mrs) {
     if (!mrs.length) {
-        return
+        return;
     }
 
     const type = mrs[0].projectId ? 'projects' : 'groups';
@@ -95,11 +96,14 @@ async function parseMrs(mrs) {
     mrs.forEach(mr => {
         const mrIid = mr.iid;
         const mrId = mr.id;
+        const authorId = mr.authorId;
         const approvedCacheKey = window.gon.current_username + '_approved_' + mrIid;
         const commentedCacheKey = window.gon.current_username + '_commented_' + mrIid;
         const baseProjectUrl = '/api/v4/projects/' + mr.projectId + '/merge_requests';
 
         chrome.storage.local.get([approvedCacheKey, commentedCacheKey], function (cachedValues) {
+            identifyYourMrs(mrId, authorId);
+
             if (mr.isValidated) {
                 identifyMr(mrId, 'approved');
                 setLocalCacheValue(approvedCacheKey, true);
@@ -114,9 +118,15 @@ async function parseMrs(mrs) {
                         setLocalCacheValue(commentedCacheKey, true);
                     }
                 });
-        
         });
     })
+}
+
+function identifyYourMrs(id, userId) {
+    const el = document.getElementById('merge_request_' + id);
+    if (window.gon.current_user_id === userId && el.getElementsByClassName('issuable-upvotes').length) {
+        el.getElementsByClassName('merge-request-title-text')[0].getElementsByTagName('a')[0].style.color = 'green';
+    }
 }
 
 function identifyMr(id, status) {
