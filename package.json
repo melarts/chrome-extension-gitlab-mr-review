@@ -1,0 +1,16 @@
+{
+  "name": "chrome-extension-gitlab-mr-review",
+  "version": "1.0.0",
+  "description": "extension for gitlab MRs reviews",
+  "main": "contentscript.js",
+  "repository": "git@github.com:melarts/chrome-extension-gitlab-mr-review.git",
+  "author": "Paul Souche <paul.souche@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.91",
+    "typescript": "^3.7.2"
+  }
+}

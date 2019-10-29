@@ -17,7 +17,14 @@ The red icons are the ones I've commented or approved.
 ### Install
 
 ```bash
+# Clone repository
 git clone https://github.com/melarts/chrome-extension-gitlab-mr-review.git
+
+# Install dependencies
+yarn
+
+# Build the script
+yarn build
 ```
 Then go to `chrome://extensions/` , activate the `Developer mode`, use the `Load unpacked extension...` button and select the cloned folder.
 
@@ -26,7 +33,14 @@ Then go to `chrome://extensions/` , activate the `Developer mode`, use the `Load
 Go to the cloned folder, and run
 
 ```bash
+# Update repository
 git pull --rebase
+
+# Update dependencies
+yarn
+
+# Build the script
+yarn build
 ```
 
 Then go to `chrome://extensions/` and use the `Reload` button of the `Gitlab merge requests review` extension.
