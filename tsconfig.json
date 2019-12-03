@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "outDir": "",
+    "strict": true,
+    "target": "es5",
+    "lib": ["dom", "es2015"],
+    "types": ["chrome"]
+  },
+  "include": ["src"]
+}
